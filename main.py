@@ -29,13 +29,11 @@ if st.button('Run Analysis'):
             ticker += '.T'
 
         # 株価データを取得
-        data = yf.download(ticker, start=start_date, end=end_date, progress=False)
-
-        if data.empty:
-            st.write(f"No data found for {ticker}.")
-        else:
-            st.write(f"Analysis for {ticker}")
-            st.line_chart(data['Close'])
+        try:
+            data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+        except Exception as e:
+            st.write(f"Failed to download data for {ticker}. Error: {str(e)}")
+            continue
 
         if data.empty:
             st.write(f"No data found for {ticker}.")
@@ -126,7 +124,11 @@ if st.button('Run Analysis'):
             ticker += '.T'
 
         # 株価データを取得
-        data = yf.download(ticker, start=start_date, end=end_date)
+        try:
+            data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+        except Exception as e:
+            st.write(f"Failed to download data for {ticker}. Error: {str(e)}")
+            continue
 
         if not data.empty:
             # 特徴量の作成
@@ -152,7 +154,6 @@ if st.button('Run Analysis'):
             clusters = kmeans.fit_predict(principal_components)
             pca_df['Cluster'] = clusters
 
-
             # 投資判断の関数を定義
             def investment_decision(cluster):
                 if cluster == 0:
@@ -161,7 +162,6 @@ if st.button('Run Analysis'):
                     return "Sell"
                 else:
                     return "Hold"
-
 
             pca_df['Decision'] = pca_df['Cluster'].apply(investment_decision)
 
@@ -238,7 +238,7 @@ if st.button('Run Analysis'):
                 sheet_name = f'Figure_{i + 1}'
                 fig.savefig(f'{sheet_name}.png', format='png')
                 worksheet = writer.sheets['Results']
-                worksheet.insert_image(f'H{i * 25 + 1}', f'{sheet_name}.png')
+                worksheet.insert_image(f'H{I * 25 + 1}', f'{sheet_name}.png')
 
         data = output.getvalue()
         return data
