@@ -29,7 +29,13 @@ if st.button('Run Analysis'):
             ticker += '.T'
 
         # 株価データを取得
-        data = yf.download(ticker, start=start_date, end=end_date)
+        data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+
+        if data.empty:
+            st.write(f"No data found for {ticker}.")
+        else:
+            st.write(f"Analysis for {ticker}")
+            st.line_chart(data['Close'])
 
         if data.empty:
             st.write(f"No data found for {ticker}.")
